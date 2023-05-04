@@ -1,0 +1,82 @@
+Transform: AWS::Serverless-2016-10-31
+Description: Example deployment of the HLS service using nested apps
+
+Parameters:
+  StageName:
+    Type: String
+    Default: dev
+  LogLevel:
+    Type: String
+    Default: info
+  SwsSecret:
+    Type: String
+    NoEcho: true
+  CloudfrontPrivateKey:
+    Type: String
+    Default: ''
+  CloudfrontKeypairId:
+    Type: String
+    Default: ''
+  StorageBucketName:
+    Type: String
+  AllowedAudioOrigins:
+    Type: String
+    Description: Origins from which the service can source audio
+    Default: '*'
+  CORSAllowedOrigins:
+    Type: String
+    Default: ''
+
+Resources:
+  AudioToolsLayer:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: node_modules/@soundws/audio-tools-lambda-layer/template.yaml
+
+  HlsService:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: node_modules/@soundws/hls-service/dist/template.yaml
+      Parameters:
+        LogLevel: !Ref LogLevel
+        StageName: !Ref StageName
+        SwsSecret: !Ref SwsSecret
+        AudioToolsLayerArn: !GetAtt AudioToolsLayer.Outputs.LayerVersion
+        CloudfrontPrivateKey: !Ref CloudfrontPrivateKey
+        CloudfrontKeypairId: !Ref CloudfrontKeypairId
+        AllowedAudioOrigins: !Ref AllowedAudioOrigins
+        CORSAllowedOrigins: !Ref CORSAllowedOrigins
+        AllowedFormats: 'mp3,oga'
+        AllowedBitrates: 128,96
+        AllowedSamplerates: 44100,48000
+        BucketName: !Ref StorageBucket
+        ExistingBucket: true
+        AllowedSegmentDuration: 5
+
+  StorageBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref StorageBucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'
+            AllowedMethods:
+              - GET
+              - HEAD
+            AllowedHeaders:
+              - '*'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+Outputs:
+  HlsServiceEndpoint:
+    Description: 'The endpoint to the hls-service'
+    Value: !GetAtt HlsService.Outputs.ServiceApi
+  SwsSecret:
+    Description: 'The secret'
+    Value: !Ref SwsSecret

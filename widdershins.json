@@ -1,0 +1,7 @@
+{
+  "language_tabs": [{ "http": "HTTP" }],
+  "verbose": true,
+  "version": false,
+  "summary": true,
+  "omitHeader": true
+}

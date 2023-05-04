@@ -1,7 +1,12 @@
-### Ignore everything ###
-*
-
-### But not these ###
-!.gitignore
-!LICENSE.md
-!README.md
+node_modules
+package-lock.json
+.webpack
+layer
+.env
+dist
+serverless.yml
+yarn-error.log
+.aws-sam
+.vscode
+packaged.yaml
+coverage

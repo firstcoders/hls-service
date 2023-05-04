@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: HLS Service API
+  description: A serverless micro-service to transcode audio into HLS format
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com/v1
+    description: An example endpoint
+
+paths:
+  /:
+    get:
+      summary: Generates a m3u8 file given a wav
+      description: Takes a sourceUrl for a WAV and returns a m3u8 playlist
+      operationId: getM3u8
+      parameters:
+        - in: query
+          name: sourceUrl
+          required: true
+          schema:
+            type: string
+            example: https://abcdefg01234.cloudfront.net/drums-wav
+      responses:
+        '200':
+          description: Success
+          content:
+            application/x-mpegURL:
+              schema:
+                type: string
+                example: >
+                  #EXTM3U
+                  #EXT-X-VERSION:3
+                  #EXT-X-MEDIA-SEQUENCE:0
+                  #EXT-X-ALLOW-CACHE:YES
+                  #EXT-X-TARGETDURATION:5
+                  #EXTINF:5.000000,
+                  https://abcdefg01234.cloudfront.net/processed-audio/...
+                  #EXTINF:5.000000,
+                  https://abcdefg01234.cloudfront.net/processed-audio/...
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

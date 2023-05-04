@@ -1,0 +1,362 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  A microservice to convert source audio and stream it (in HLS format) to the Sound Web Services Stems Player.
+
+  Check out https://github.com/sound-ws/stems-player-documentation/wiki
+  for more information.
+
+Conditions:
+  CreateBucket: !Not [!Equals [!Ref ExistingBucket, true]]
+
+Parameters:
+  # todo more validation
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/parameters-section-structure.html
+  LogLevel:
+    Type: String
+    Description: The log level
+    Default: 'error'
+    AllowedValues:
+      - debug
+      - info
+      - error
+  StageName:
+    Type: String
+    Description: The api gateway stage name
+    Default: 'prd'
+    AllowedValues:
+      - dev
+      - uat
+      - prd
+  SwsSecret:
+    Type: String
+    Description: The shared JWT secret used to authenticate to the service.
+    NoEcho: true
+    # MinLength: 16
+    # MaxLength: 32
+  CloudfrontPrivateKey:
+    Type: String
+    Description: The cloudfront private key
+    NoEcho: true
+    Default: ''
+  CloudfrontKeypairId:
+    Type: String
+    Description: The cloudfront keypairId
+    NoEcho: true
+    Default: ''
+  AllowedSamplerates:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of allowed sample rates
+    Default: '22050'
+  AllowedBitrates:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of allowed bitrates
+    Default: '128'
+  AllowedFormats:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of of allowed formats
+    Default: 'mp3'
+    # AllowedPattern: ^((mp3|wav|m4a|ogg),?)+$
+    # NOTE: AllowedValues Doesnt work with CommaDelimitedList
+    # @see https://stackoverflow.com/questions/62475499/selecting-multiple-values-from-dropdownlist-in-cloudformation-template
+    # AllowedValues:
+    #   - wav
+    #   - mp3
+    #   - ogg
+    #   - m4a
+  AllowedSegmentDuration:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of of allowed segment duration
+    Default: '5'
+  AudioCacheTtl:
+    Type: Number
+    Description: Determines how long unused processed audio is held before its removed from the audio bucket. Default 30 days.
+    Default: '2592000'
+  S3MaxCacheAge:
+    Type: Number
+    Description: The max-age cache header given to the audio objects, determining how long they stay cached in Cloudfront. Default 30 days.
+    Default: '2592000'
+  AudioToolsLayerArn:
+    Type: String
+    Description: The arn of the lambda layer containing ffmpeg & lame static binaries
+  BucketName:
+    Type: String
+    Description: The name of the audio Bucket used for the cache
+  ExistingBucket:
+    Type: String
+    Description: Whether to create the audio bucket
+    AllowedValues:
+      - true
+      - false
+    Default: 'false'
+  SignedUrlExpirySec:
+    Type: String
+    Description: The duration of the signed urls to the audio
+    Default: 21600
+  # ReservedConcurrentExecutions:
+  #   Type: Number
+  #   Description: The number of reserved concurrent executions for each lambda
+  #   Default: '100'
+  AllowedAudioOrigins:
+    Type: CommaDelimitedList
+    Description: Comma-delimited list of origins from which the service can fetch audio
+    Default: '*'
+  CORSAllowedOrigins:
+    Type: String
+    Description: The allowed origin header value to return
+    Default: ''
+
+Globals:
+  # https://github.com/aws/serverless-application-model/issues/191
+  # https://github.com/aws/chalice/issues/1655
+  Api:
+    OpenApiVersion: 3.0.1
+  Function:
+    Timeout: 3
+    Runtime: nodejs14.x
+    MemorySize: 256
+    CodeUri: src
+    # ReservedConcurrentExecutions: !Ref ReservedConcurrentExecutions
+    Environment:
+      Variables:
+        LOG_LEVEL: !Ref LogLevel
+        AUDIO_BUCKET_NAME: !Ref BucketName
+        DYNAMODB_TABLE_M3U8FILE: !Ref M3u8FileTable
+        SWS_SECRET: !Ref SwsSecret
+        ALLOWED_SAMPLE_RATES: !Join [',', !Ref AllowedSamplerates]
+        ALLOWED_FORMATS: !Join [',', !Ref AllowedFormats]
+        ALLOWED_BITRATES: !Join [',', !Ref AllowedBitrates]
+        ALLOWED_SEGMENT_DURATION: !Join [',', !Ref AllowedSegmentDuration]
+        AUDIO_CACHE_TTL: !Ref AudioCacheTtl
+        S3_CACHE_MAX_AGE: !Ref S3MaxCacheAge
+        ALLOWED_AUDIO_ORIGINS: !Join [',', !Ref AllowedAudioOrigins]
+        CORS_ALLOWED_ORIGIN: !Ref CORSAllowedOrigins
+        SIGNED_URL_EXPIRY_SEC: !Ref SignedUrlExpirySec
+        # https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/node-reusing-connections.html
+        # This is enabled by default
+        # AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+
+Resources:
+  ServiceApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+      # https://github.com/aws/serverless-application-model/releases/tag/v1.46.0
+      # https://github.com/aws/serverless-application-model/pull/2298
+      ApiKeySourceType: AUTHORIZER
+      Auth:
+        DefaultAuthorizer: BearerTokenAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          BearerTokenAuthorizer:
+            FunctionArn: !GetAtt AuthBearerTokenFunction.Arn
+            ReauthorizeEvery: 3600
+      Cors:
+        AllowMethods: "'POST, GET'"
+        AllowHeaders: "'Authorization'"
+        AllowOrigin: "'*'"
+        MaxAge: "'86400'"
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Expose-Headers: "'*'"
+              Access-Control-Allow-Origin: "'*'"
+
+  # ********************************* Functions *********************************
+
+  AuthBearerTokenFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Description: Authorizer using a bearer token contained in the authorization header
+      Handler: handlers/authorizeBearerToken.handler
+
+  GetM3u8Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Gets or generates a m3u8 file given a wav
+      Handler: handlers/getM3u8.handler
+      Timeout: 30
+      Events:
+        GetM3u8:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ServiceApi
+            Path: /
+            Method: get
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref BucketName
+        - DynamoDBCrudPolicy:
+            TableName: !Ref M3u8FileTable
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CreateM3u8Function
+      Environment:
+        Variables:
+          LAMBDA_CREATE_M3U8_ARN: !GetAtt CreateM3u8Function.Arn
+          AWS_CLOUDFRONT_DOMAIN: !GetAtt CloudFrontDistribution.DomainName
+          AWS_CLOUDFRONT_PRIVATE_KEY: !Ref CloudfrontPrivateKey
+          AWS_CLOUDFRONT_KEYPAIR_ID: !Ref CloudfrontKeypairId
+
+  CreateM3u8Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Generates a m3u8 file given a wav
+      MemorySize: 4096
+      Timeout: 120
+      Handler: handlers/createM3u8.handler
+      Events:
+        CreateM3u8:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post
+            RestApiId: !Ref ServiceApi
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref M3u8FileTable
+        - S3CrudPolicy:
+            BucketName: !Ref BucketName
+      Layers:
+        - !Ref AudioToolsLayerArn
+      Environment:
+        Variables:
+          FFMPEG_BIN_PATH: /opt/bin/ffmpeg
+          LAME_BIN_PATH: /opt/bin/lame
+          SOX_BIN_PATH: /opt/bin/sox
+          FFPROBE_BIN_PATH: /opt/bin/ffprobe
+
+  PurgeObjectsFromS3Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Description: Removes audio from the audio bucket when the corresponding record is deleted from dynamodb
+      Handler: handlers/purgeObjects.handler
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt M3u8FileTable.StreamArn
+            BatchSize: 100
+            StartingPosition: LATEST
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"eventName": ["REMOVE"]}'
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref BucketName
+
+  # ********************************* General Resources *********************************
+  AudioBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Condition: CreateBucket
+    Properties:
+      # https://stackoverflow.com/questions/54897459/how-to-set-semi-random-name-for-s3-bucket-using-cloud-formation
+      BucketName: !Ref BucketName
+      # TODO review
+      # https://www.serverless.com/blog/cors-api-gateway-survival-guide
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'
+            AllowedMethods:
+              - GET
+              - HEAD
+            AllowedHeaders:
+              - '*'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  AllowCloudFrontBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref BucketName
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              CanonicalUser:
+                Fn::GetAtt: [CloudfrontOriginaccessIdentity, S3CanonicalUserId]
+            Action: 's3:GetObject'
+            Resource: !Sub ['arn:aws:s3:::${bucket}/*', { bucket: !Ref BucketName }]
+
+  CloudfrontOriginaccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: Cloudfront distribution for hls-service audiobucket
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: Distribution to serve audio from the audio segment service
+        DefaultCacheBehavior:
+          TargetOriginId: AudioBucketOrigin
+          AllowedMethods:
+            - HEAD
+            - GET
+            - OPTIONS
+          ViewerProtocolPolicy: 'redirect-to-https'
+          DefaultTTL: 108000
+          # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-cachebehavior.html#cfn-cloudfront-distribution-cachebehavior-trustedsigners
+          TrustedSigners:
+            - self
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+            Headers:
+              - 'Origin'
+              - 'Access-Control-Allow-Origin'
+              - 'Access-Control-Allow-Headers'
+              - 'Access-Control-Allow-Credentials'
+        Enabled: true
+        Origins:
+          - Id: AudioBucketOrigin
+            S3OriginConfig:
+              OriginAccessIdentity:
+                Fn::Join:
+                  - ''
+                  - - 'origin-access-identity/cloudfront/'
+                    - Ref: CloudfrontOriginaccessIdentity
+            DomainName:
+              !Sub ['${bucket}.s3.${AWS::Region}.amazonaws.com', { bucket: !Ref BucketName }]
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: true
+
+  M3u8FileTable:
+    Type: 'AWS::DynamoDB::Table'
+    DeletionPolicy: Delete
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: objectKey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: objectKey
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      # Dont provide one and aws will generate a unique table name
+      # https://serverfault.com/questions/898821/tradeoffs-for-naming-dynamodb-tables-with-cloudformation
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      StreamSpecification:
+        StreamViewType: KEYS_ONLY
+
+Outputs:
+  ApiId:
+    Description: 'The API Gateway id'
+    Value: !Ref ServiceApi
+  ServiceApi:
+    Description: 'API Gateway endpoint URL'
+    Value: !Sub 'https://${ServiceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/'
