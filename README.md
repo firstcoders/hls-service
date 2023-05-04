@@ -2,6 +2,10 @@
 
 A serverless micro-service to transcode audio into HLS format.
 
+## Contributing
+
+> This repo is a subtree split of our monorepo which will be made public in due course. We cannot process any pull-requests to this repo. Please contact us for help.
+
 # Requirements
 
 Installation of this service requires an AWS account and IAM credentials with appropriate permissions.
