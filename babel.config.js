@@ -6,7 +6,7 @@ module.exports = {
         targets: {
           node: '14',
         },
-        modules: 'commonjs',
+        modules: 'auto',
       },
     ],
   ],

@@ -4,7 +4,6 @@ const fs = require('fs');
 const TerserPlugin = require('terser-webpack-plugin');
 // const nodeExternals = require('webpack-node-externals');
 const { LicenseWebpackPlugin } = require('license-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
 
 const awsSamPlugin = new AwsSamPlugin();
 
@@ -146,26 +145,17 @@ module.exports = {
       unacceptableLicenseTest: (licenseType) =>
         licenseType && licenseType.toUpperCase().indexOf('GPL') !== -1,
       perChunkOutput: false,
-      outputFilename: '.aws-sam/build/LICENSE',
+      outputFilename: '.aws-sam/build/THIRD-PARTY-LICENSES.txt',
       excludedPackageTest: (packageName) =>
         ['webpack', 'aws-sdk', '@soundws/utils', '@soundws/service-utils'].indexOf(packageName) !==
         -1,
-      renderLicenses: (modules) => {
-        const license = fs.readFileSync(path.join(__dirname, 'LICENSE'));
-
-        const thirdParty = modules
+      renderLicenses: (modules) =>
+        modules
           .map(
             (p) =>
               `This product bundles "${p.name}", which is available under a "${p.licenseId}" license:\n\n${p.licenseText}\n`
           )
-          .join('\n');
-
-        return `${license}\n${thirdParty}`;
-      },
-    }),
-
-    new CopyPlugin({
-      patterns: [{ from: 'README.md', to: '.aws-sam/build/README.md' }],
+          .join('\n'),
     }),
   ],
 };
