@@ -40,22 +40,7 @@ const handleRequest = async (event) => {
     };
   }
 
-  let cacheKey;
-  try {
-    cacheKey = await getCacheKey(options.sourceUrl);
-  } catch (err) {
-    if (err.code === 'GetEtagFromOriginError') {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          code: err.code,
-          errors: ['The origin server did not respond with an etag'],
-        }),
-      };
-    }
-
-    throw err;
-  }
+  const cacheKey = getCacheKey(options.sourceUrl);
 
   // get the fully qualified key on S3
   const key = getKey(cacheKey, options);

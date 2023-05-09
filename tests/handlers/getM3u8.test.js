@@ -2,17 +2,14 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { ddbGetRecord, lambdaInvoke } from '@soundws/service-libs';
 import { handler } from '../../src/handlers/getM3u8';
-import getCacheKey from '../../src/services/getCacheKey';
 import event from '../events/getM3u8';
 import generateUrlForObject from '../../src/services/generateUrlForObject';
 import config from '../../src/config';
 
-jest.mock('@soundws/service-libs/src/getEtag');
 jest.mock('@soundws/service-libs/src/ddbGetRecord');
 jest.mock('@soundws/service-libs/src/ddbPutRecord');
 jest.mock('@soundws/service-libs/src/lambdaInvoke');
 jest.mock('@soundws/service-libs/src/logger');
-jest.mock('../../src/services/getCacheKey');
 jest.mock('../../src/services/generateUrlForObject');
 
 config.createM3U8LambdaArn = 'arn:thisismycreatefunction';
@@ -37,7 +34,6 @@ describe('getM3u8', () => {
     beforeEach(() => {
       // in allowed origins
       event.queryStringParameters.sourceUrl = 'https://d2m8h53em6mi65.cloudfront.net/drums.wav';
-      getCacheKey.mockResolvedValue('df735c704be5482767c1b1c8e2233b5c');
 
       // mock signing a url
       generateUrlForObject.mockResolvedValue('https://this-is-a-signed-url/drums.wav?key=blah');

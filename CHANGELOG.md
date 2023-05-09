@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.8](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.0.0-beta.7...@soundws/hls-service@3.0.0-beta.8) (2023-05-09)
+
+
+### Bug Fixes
+
+* **hls-service:** fix for bundling esm dependency. Set babel to module auto ([22b4b90](https://github.com/sound-ws/hls-service/commit/22b4b90720f7fe01765f1677c2566c1fbc06242f))
+
+
+
+
+
 # [3.0.0-beta.7](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.0.0-beta.6...@soundws/hls-service@3.0.0-beta.7) (2023-05-04)
 
 **Note:** Version bump only for package @soundws/hls-service
