@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.9](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.0.0-beta.8...@soundws/hls-service@3.0.0-beta.9) (2023-05-09)
+
+
+### Features
+
+* **hls-service:** performance boost by removing etag functionality at the expense of revalidation ([87e5b6c](https://github.com/sound-ws/hls-service/commit/87e5b6ce7632f77e4660c1c33db37df493a7cde3))
+
+
+
+
+
 # [3.0.0-beta.8](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.0.0-beta.7...@soundws/hls-service@3.0.0-beta.8) (2023-05-09)
 
 

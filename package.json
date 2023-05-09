@@ -1,6 +1,6 @@
 {
   "name": "@soundws/hls-service",
-  "version": "3.0.0-beta.8",
+  "version": "3.0.0-beta.9",
   "license": "AGPL-3.0-or-later",
   "description": "A serverless microservice to segment audio for consumption by our stem player",
   "author": "The First Coders Team (https://www.firstcoders.co.uk)",
