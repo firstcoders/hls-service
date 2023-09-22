@@ -38,7 +38,7 @@
     "m3u8"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   },
   "devDependencies": {
     "@babel/cli": "^7.21.0",
