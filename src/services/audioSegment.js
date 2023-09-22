@@ -57,7 +57,7 @@ export default async (options) => {
     // change the file extensions
     const updatedContents = contents.replace(
       /(segment-\d+)(\.wav)/g,
-      `${options.folderPrefix}/$1.${options.format}`
+      `${options.folderPrefix}/$1.${options.format}`,
     );
 
     // write the file back to disk

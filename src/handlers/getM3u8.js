@@ -74,8 +74,8 @@ const handleRequest = async (event) => {
         config.s3FolderPrefix
         // eslint-disable-next-line no-useless-escape
       }/${cacheKey}(\/[a-z0-9]+)+[a-z]+\.segment-[0-9]+\.[a-z0-9]+`,
-      'gs'
-    )
+      'gs',
+    ),
   );
 
   // create a signed url for each object
@@ -84,8 +84,8 @@ const handleRequest = async (event) => {
       generateUrlForObject(object).then((url) => ({
         object,
         url,
-      }))
-    )
+      })),
+    ),
   );
 
   // replace each object with the signed url
