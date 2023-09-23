@@ -78,12 +78,12 @@
   },
   "scripts": {
     "test": "jest tests/",
-    "build": "yarn build:docs && yarn build:dist && sam build",
-    "build:dist": "rm -rf .aws-sam dist && webpack --mode production && cp -R .aws-sam/build dist",
+    "build": "yarn build:docs && yarn build:dist",
+    "build:dist": "rm -rf .aws-sam dist && webpack --mode production && cp README.md .aws-sam/build && cp LICENSE .aws-sam/build && cp -R .aws-sam/build dist",
     "build:docs": "rimraf docs/ && mkdir docs/ && yarn widdershins --environment widdershins.json openapi.yaml -o docs/api.md",
     "prepublishOnly": "yarn build",
     "qa": "eslint \"src/**/*.js\"",
     "precommit": "lint-staged",
-    "sam:publish": "sam build && sam package --template-file .aws-sam/build/template.yaml --output-template-file .aws-sam/build/packaged.yaml --s3-bucket $AWS_SAM_PACKAGE_BUCKET_NAME --region ${AWS_REGION:=us-east-1} && sam publish --template .aws-sam/build/packaged.yaml --region ${AWS_REGION:=us-east-1} --semantic-version $npm_package_version"
+    "sam:publish": "npm run build && sam package --template-file .aws-sam/build/template.yaml --output-template-file .aws-sam/build/packaged.yaml --s3-bucket $AWS_SAM_PACKAGE_BUCKET_NAME --region ${AWS_REGION:=us-east-1} && sam publish --template .aws-sam/build/packaged.yaml --region ${AWS_REGION:=us-east-1} --semantic-version $npm_package_version"
   }
 }
