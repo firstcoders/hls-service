@@ -84,6 +84,6 @@
     "prepublishOnly": "yarn build",
     "qa": "eslint \"src/**/*.js\"",
     "precommit": "lint-staged",
-    "sam:publish": "sam package --template-file .aws-sam/build/template.yaml --output-template-file .aws-sam/build/packaged.yaml --s3-bucket $AWS_SAM_PACKAGE_BUCKET_NAME --region ${AWS_REGION:=us-east-1} && sam publish --template .aws-sam/build/packaged.yaml --region ${AWS_REGION:=us-east-1} --semantic-version $npm_package_version"
+    "sam:publish": "sam build && sam package --template-file .aws-sam/build/template.yaml --output-template-file .aws-sam/build/packaged.yaml --s3-bucket $AWS_SAM_PACKAGE_BUCKET_NAME --region ${AWS_REGION:=us-east-1} && sam publish --template .aws-sam/build/packaged.yaml --region ${AWS_REGION:=us-east-1} --semantic-version $npm_package_version"
   }
 }
