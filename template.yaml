@@ -360,3 +360,17 @@ Outputs:
   ServiceApi:
     Description: 'API Gateway endpoint URL'
     Value: !Sub 'https://${ServiceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/'
+
+Metadata:
+  AWS::ServerlessRepo::Application:
+    Name: soundws-hls-service
+    Description: >
+      A serverless micro-service to transcode audio into HLS format.
+    Author: Team First Coders
+    ReadmeUrl: README.md
+    SpdxLicenseId: AGPL-3.0-or-later
+    LicenseUrl: LICENSE
+    Labels: ['layer', 'lambda', 'serverless', 'ffmpeg', 'hls', 'm3u8', 'stemplayer']
+    HomePageUrl: https://github.com/sound-ws/hls-service
+    SourceCodeUrl: https://github.com/sound-ws/hls-service
+    SemanticVersion: 1.0.0 # overwritten by sam publish cli command
