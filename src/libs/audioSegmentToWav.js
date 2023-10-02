@@ -20,12 +20,19 @@ import runFfmpeg from './audioRunFfmpeg';
  * Segments a source file into WAV segments. It does some rechunking of the to ensure a consistent frame size.
  * This helps to ensure that eventual playback works nicely with respect to gapless playback using the Web-Audio API.
  */
-export default ({ sourceUrl, segmentTime, sampleRate, tmpWorkspaceFolder }) =>
+export default ({
+  sourceUrl,
+  segmentTime,
+  sampleRate,
+  tmpWorkspaceFolder,
+  audioOutputMaxDuration,
+}) =>
   runFfmpeg([
     '-i',
     sourceUrl,
     '-f',
     'segment',
+    ...(audioOutputMaxDuration ? ['-t', audioOutputMaxDuration] : []),
     '-ar',
     sampleRate,
     '-bsf',

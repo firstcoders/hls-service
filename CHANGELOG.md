@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0-beta.0](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.0.1-beta.3...@soundws/hls-service@3.1.0-beta.0) (2023-09-24)
+
+
+### Bug Fixes
+
+* **hls-service:** added cors allowed origin param to bucket in CF ([23f9967](https://github.com/sound-ws/hls-service/commit/23f996707100639666513c27b669a48865214fda))
+* **hls-service:** ensure we limit audio output duration to 10 mins by default ([a2129bf](https://github.com/sound-ws/hls-service/commit/a2129bf4399d268daed359fcd2576e5fa3d64372))
+
+
+### Features
+
+* **hls-service:** removed cloudfront distribution and code generating cloudfront urls ([14925a1](https://github.com/sound-ws/hls-service/commit/14925a13e4bde187869835c2f62c85b4ce8a3985))
+
+
+
+
+
 ## [3.0.1-beta.3](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.0.1-beta.2...@soundws/hls-service@3.0.1-beta.3) (2023-09-22)
 
 **Note:** Version bump only for package @soundws/hls-service

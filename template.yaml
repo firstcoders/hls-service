@@ -8,6 +8,7 @@ Description: >
 
 Conditions:
   CreateBucket: !Not [!Equals [!Ref ExistingBucket, true]]
+  # HasAuthorizer: !Not [!Equals [!Ref AuthorizerArn, '']]
 
 Parameters:
   # todo more validation
@@ -28,22 +29,6 @@ Parameters:
       - dev
       - uat
       - prd
-  SwsSecret:
-    Type: String
-    Description: The shared JWT secret used to authenticate to the service.
-    NoEcho: true
-    # MinLength: 16
-    # MaxLength: 32
-  CloudfrontPrivateKey:
-    Type: String
-    Description: The cloudfront private key
-    NoEcho: true
-    Default: ''
-  CloudfrontKeypairId:
-    Type: String
-    Description: The cloudfront keypairId
-    NoEcho: true
-    Default: ''
   AllowedSamplerates:
     Type: CommaDelimitedList
     Description: Comma-delimited list of allowed sample rates
@@ -74,7 +59,7 @@ Parameters:
     Default: '2592000'
   S3MaxCacheAge:
     Type: Number
-    Description: The max-age cache header given to the audio objects, determining how long they stay cached in Cloudfront. Default 30 days.
+    Description: The max-age cache header given to the audio objects in S3. Default 30 days.
     Default: '2592000'
   AudioToolsLayerArn:
     Type: String
@@ -88,7 +73,7 @@ Parameters:
     AllowedValues:
       - true
       - false
-    Default: 'false'
+    Default: false
   SignedUrlExpirySec:
     Type: String
     Description: The duration of the signed urls to the audio
@@ -102,8 +87,16 @@ Parameters:
     Description: Comma-delimited list of origins from which the service can fetch audio
     Default: '*'
   CORSAllowedOrigins:
-    Type: String
+    Type: CommaDelimitedList
     Description: The allowed origin header value to return
+    Default: ''
+  AudioOutputMaxDuration:
+    Type: Number
+    Description: The maximum output duration (in seconds)
+    Default: '600'
+  AuthorizerArn:
+    Type: String
+    Description: The ARN of a lambda authorizer
     Default: ''
 
 Globals:
@@ -122,7 +115,6 @@ Globals:
         LOG_LEVEL: !Ref LogLevel
         AUDIO_BUCKET_NAME: !Ref BucketName
         DYNAMODB_TABLE_M3U8FILE: !Ref M3u8FileTable
-        SWS_SECRET: !Ref SwsSecret
         ALLOWED_SAMPLE_RATES: !Join [',', !Ref AllowedSamplerates]
         ALLOWED_FORMATS: !Join [',', !Ref AllowedFormats]
         ALLOWED_BITRATES: !Join [',', !Ref AllowedBitrates]
@@ -130,11 +122,9 @@ Globals:
         AUDIO_CACHE_TTL: !Ref AudioCacheTtl
         S3_CACHE_MAX_AGE: !Ref S3MaxCacheAge
         ALLOWED_AUDIO_ORIGINS: !Join [',', !Ref AllowedAudioOrigins]
-        CORS_ALLOWED_ORIGIN: !Ref CORSAllowedOrigins
+        CORS_ALLOWED_ORIGIN: !Join [',', !Ref CORSAllowedOrigins]
         SIGNED_URL_EXPIRY_SEC: !Ref SignedUrlExpirySec
-        # https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/node-reusing-connections.html
-        # This is enabled by default
-        # AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+        AUDIO_OUTPUT_MAX_DURATION: !Ref AudioOutputMaxDuration
 
 Resources:
   ServiceApi:
@@ -145,11 +135,11 @@ Resources:
       # https://github.com/aws/serverless-application-model/pull/2298
       ApiKeySourceType: AUTHORIZER
       Auth:
-        DefaultAuthorizer: BearerTokenAuthorizer
+        DefaultAuthorizer: Authorizer
         AddDefaultAuthorizerToCorsPreflight: false
         Authorizers:
-          BearerTokenAuthorizer:
-            FunctionArn: !GetAtt AuthBearerTokenFunction.Arn
+          Authorizer:
+            FunctionArn: !Ref AuthorizerArn
             ReauthorizeEvery: 3600
       Cors:
         AllowMethods: "'POST, GET'"
@@ -169,12 +159,6 @@ Resources:
               Access-Control-Allow-Origin: "'*'"
 
   # ********************************* Functions *********************************
-
-  AuthBearerTokenFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Description: Authorizer using a bearer token contained in the authorization header
-      Handler: handlers/authorizeBearerToken.handler
 
   GetM3u8Function:
     Type: AWS::Serverless::Function
@@ -199,9 +183,20 @@ Resources:
       Environment:
         Variables:
           LAMBDA_CREATE_M3U8_ARN: !GetAtt CreateM3u8Function.Arn
-          AWS_CLOUDFRONT_DOMAIN: !GetAtt CloudFrontDistribution.DomainName
-          AWS_CLOUDFRONT_PRIVATE_KEY: !Ref CloudfrontPrivateKey
-          AWS_CLOUDFRONT_KEYPAIR_ID: !Ref CloudfrontKeypairId
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        Target: 'es2020'
+        Sourcemap: false
+        EntryPoints:
+          - handlers/getM3u8.js
+        External:
+          - '@aws-sdk'
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
 
   CreateM3u8Function:
     Type: AWS::Serverless::Function
@@ -230,6 +225,20 @@ Resources:
           LAME_BIN_PATH: /opt/bin/lame
           SOX_BIN_PATH: /opt/bin/sox
           FFPROBE_BIN_PATH: /opt/bin/ffprobe
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        Target: 'es2020'
+        Sourcemap: false
+        EntryPoints:
+          - handlers/createM3u8.js
+        External:
+          - '@aws-sdk'
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
 
   PurgeObjectsFromS3Function:
     Type: AWS::Serverless::Function
@@ -249,11 +258,24 @@ Resources:
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref BucketName
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Format: esm
+        OutExtension:
+          - .js=.mjs
+        Target: 'es2020'
+        Sourcemap: false
+        EntryPoints:
+          - handlers/purgeObjects.js
+        External:
+          - '@aws-sdk'
 
   # ********************************* General Resources *********************************
   AudioBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Condition: CreateBucket
     Properties:
       # https://stackoverflow.com/questions/54897459/how-to-set-semi-random-name-for-s3-bucket-using-cloud-formation
@@ -262,8 +284,7 @@ Resources:
       # https://www.serverless.com/blog/cors-api-gateway-survival-guide
       CorsConfiguration:
         CorsRules:
-          - AllowedOrigins:
-              - '*'
+          - AllowedOrigins: !Ref CORSAllowedOrigins
             AllowedMethods:
               - GET
               - HEAD
@@ -274,65 +295,6 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-
-  AllowCloudFrontBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref BucketName
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              CanonicalUser:
-                Fn::GetAtt: [CloudfrontOriginaccessIdentity, S3CanonicalUserId]
-            Action: 's3:GetObject'
-            Resource: !Sub ['arn:aws:s3:::${bucket}/*', { bucket: !Ref BucketName }]
-
-  CloudfrontOriginaccessIdentity:
-    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-    Properties:
-      CloudFrontOriginAccessIdentityConfig:
-        Comment: Cloudfront distribution for hls-service audiobucket
-
-  CloudFrontDistribution:
-    Type: AWS::CloudFront::Distribution
-    Properties:
-      DistributionConfig:
-        Comment: Distribution to serve audio from the audio segment service
-        DefaultCacheBehavior:
-          TargetOriginId: AudioBucketOrigin
-          AllowedMethods:
-            - HEAD
-            - GET
-            - OPTIONS
-          ViewerProtocolPolicy: 'redirect-to-https'
-          DefaultTTL: 108000
-          # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-cachebehavior.html#cfn-cloudfront-distribution-cachebehavior-trustedsigners
-          TrustedSigners:
-            - self
-          ForwardedValues:
-            QueryString: false
-            Cookies:
-              Forward: none
-            Headers:
-              - 'Origin'
-              - 'Access-Control-Allow-Origin'
-              - 'Access-Control-Allow-Headers'
-              - 'Access-Control-Allow-Credentials'
-        Enabled: true
-        Origins:
-          - Id: AudioBucketOrigin
-            S3OriginConfig:
-              OriginAccessIdentity:
-                Fn::Join:
-                  - ''
-                  - - 'origin-access-identity/cloudfront/'
-                    - Ref: CloudfrontOriginaccessIdentity
-            DomainName:
-              !Sub ['${bucket}.s3.${AWS::Region}.amazonaws.com', { bucket: !Ref BucketName }]
-        ViewerCertificate:
-          CloudFrontDefaultCertificate: true
 
   M3u8FileTable:
     Type: 'AWS::DynamoDB::Table'

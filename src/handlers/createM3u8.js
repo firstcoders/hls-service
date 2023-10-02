@@ -15,23 +15,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import { rmdir } from 'fs/promises';
-import { logger, createHandler, getCorsHeaders, s3PutFolder } from '@soundws/service-libs';
+import logger from '@soundws/service-libs/src/logger';
+import createHandler from '@soundws/service-libs/src/createHandler';
+import s3PutFolder from '@soundws/service-libs/src/s3PutFolder';
 import parseRequestOptions from '../services/parseRequestOptions';
-import getKey from '../services/getKey';
+import getS3Key from '../services/getS3Key';
 import ddbGetObject from '../services/ddbGetObject';
 import ddbPutObject from '../services/ddbPutObject';
 import audioSegment from '../services/audioSegment';
 import config from '../config';
 import getCacheKey from '../services/getCacheKey';
+import createCORSResponse from '../services/createCORSResponse';
 
-const handleRequest = async (event) => {
+const handler = createHandler(async (event) => {
   logger.debug('Running with config', config);
 
   const options = parseRequestOptions(event);
   const cacheKey = getCacheKey(options.sourceUrl);
 
   // get the fully qualified key on S3
-  const key = getKey(cacheKey, options);
+  const key = getS3Key(cacheKey, options);
 
   // Check if we already have segmented this file previously
   // TODO getM3u8 checks S3. Perhaps check S3 here too instead of ddb
@@ -40,7 +43,7 @@ const handleRequest = async (event) => {
 
   // We have already processed the file
   if (m3u8File) {
-    return {
+    return createCORSResponse(event, {
       statusCode: 200, // 409, an error code may trigger retry
       headers: {
         'Content-Type': 'application/json',
@@ -49,7 +52,7 @@ const handleRequest = async (event) => {
         message: 'The file was already processed. Skipping',
         key,
       }),
-    };
+    });
   }
 
   // process the audio
@@ -69,38 +72,14 @@ const handleRequest = async (event) => {
   // store the data in dynamodb
   await ddbPutObject(key, m3u8FileContents);
 
-  return {
+  return createCORSResponse(event, {
     statusCode: 201,
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      message: 'Created file',
+      message: 'Created',
       key,
     }),
-  };
-};
-
-const handler = createHandler(async (event) => {
-  try {
-    const response = await handleRequest(event);
-
-    return {
-      ...response,
-      headers: {
-        // all is json
-        'Content-Type': 'application/json',
-
-        // mix in the cors headers
-        ...getCorsHeaders({
-          requestHeaders: event.headers,
-          allowedOrigins: config.CORSAllowedOrigins,
-        }),
-
-        ...response.headers,
-      },
-    };
-  } catch (error) {
-    logger.error('The request failed', { error: error.message });
-    throw error;
-  }
+  });
 });
 
 // eslint-disable-next-line import/prefer-default-export

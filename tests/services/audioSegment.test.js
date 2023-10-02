@@ -36,7 +36,7 @@ describe('audioSegment', () => {
       fs.copyFileSync(resolve(fixturesFolder, 'index.m3u8'), resolve(tmpFolder, 'index.m3u8'));
       fs.copyFileSync(
         resolve(fixturesFolder, 'segment-000.wav'),
-        resolve(tmpFolder, 'segment-000.wav')
+        resolve(tmpFolder, 'segment-000.wav'),
       );
     });
 

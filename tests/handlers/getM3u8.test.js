@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import { ddbGetRecord, lambdaInvoke } from '@soundws/service-libs';
+import ddbGetRecord from '@soundws/service-libs/src/ddbGetRecord';
+import lambdaInvoke from '@soundws/service-libs/src/lambdaInvoke';
 import { handler } from '../../src/handlers/getM3u8';
 import event from '../events/getM3u8';
 import generateUrlForObject from '../../src/services/generateUrlForObject';

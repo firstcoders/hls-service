@@ -15,7 +15,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import { spawn } from 'child_process';
-import { logger } from '@soundws/service-libs';
+import logger from '@soundws/service-libs/src/logger';
 
 /**
  * Runs a simple command

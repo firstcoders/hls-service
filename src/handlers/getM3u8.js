@@ -14,124 +14,68 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import axios from 'axios';
-import axiosRetry from 'axios-retry';
-import { logger, createHandler, getCorsHeaders, lambdaInvoke } from '@soundws/service-libs';
+import logger from '@soundws/service-libs/src/logger';
+import createHandler from '@soundws/service-libs/src/createHandler';
+import lambdaInvokeCreateM3u8 from '../services/lambdaInvokeCreateM3u8';
 import ddbGetObject from '../services/ddbGetObject';
 import ddbTouchObject from '../services/ddbTouchObject';
 import parseRequestOptions from '../services/parseRequestOptions';
-import getKey from '../services/getKey';
+import getS3Key from '../services/getS3Key';
 import config from '../config';
-import generateUrlForObject from '../services/generateUrlForObject';
 import getCacheKey from '../services/getCacheKey';
+import transformMu38ObjectPathsToUrls from '../services/transformMu38ObjectPathsToUrls';
+import createCORSResponse from '../services/createCORSResponse';
 
-// Make things more robust by retrying stuff
-// https://www.npmjs.com/package/axios-retry
-axiosRetry(axios, { retries: 3 });
+const handler = createHandler(async (event) => {
+  logger.debug('Running with config', config);
 
-const handleRequest = async (event) => {
   let options;
   try {
     options = parseRequestOptions(event);
   } catch (err) {
-    return {
+    return createCORSResponse(event, {
       statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ errors: err.errors }),
-    };
+    });
   }
 
   const cacheKey = getCacheKey(options.sourceUrl);
 
   // get the fully qualified key on S3
-  const key = getKey(cacheKey, options);
+  const key = getS3Key(cacheKey, options);
 
   // we don't wait for touch as it can run concurrently
   const touchPromise = ddbTouchObject(key).catch(() => {});
+
+  // check ddb for a record
   let record = await ddbGetObject(key);
 
+  // if this doesnt exist, create...
   if (!record) {
     logger.info(`Key ${key} does not exist. Creating.`);
 
-    // We delegate creating of the m3u8 to another lambda. We want to keep this lambda nice and lean in order to minimise
-    // cold-start times so we don't include the layers required by createM3u8; also we want to keep memory low.
-    // TODO for now this seems the simples solution, however using SQS/SNS may be required. Another alternative
-    // is step functions, however keeping things simple wins the day for now.
-    await lambdaInvoke({
-      FunctionName: config.createM3U8LambdaArn,
-      InvocationType: 'RequestResponse',
-      Payload: JSON.stringify({
-        queryStringParameters: event.queryStringParameters,
-      }),
-    });
+    // create the m3u8 in a separate lambda with more ooomph
+    await lambdaInvokeCreateM3u8(event);
 
+    // get the created record (with consistent read)
     record = await ddbGetObject(key, true);
   }
 
-  // fetch keys from m3u8
-  const objects = record.contents.match(
-    new RegExp(
-      `${
-        config.s3FolderPrefix
-        // eslint-disable-next-line no-useless-escape
-      }/${cacheKey}(\/[a-z0-9]+)+[a-z]+\.segment-[0-9]+\.[a-z0-9]+`,
-      'gs',
-    ),
-  );
-
-  // create a signed url for each object
-  const map = await Promise.all(
-    objects.map((object) =>
-      generateUrlForObject(object).then((url) => ({
-        object,
-        url,
-      })),
-    ),
-  );
-
-  // replace each object with the signed url
-  let body = record.contents;
-  map.forEach(({ object, url }) => {
-    body = body.replace(object, url);
-  });
+  // transform the segment keys in the m3u8 into a fully qualified, signed url
+  const body = await transformMu38ObjectPathsToUrls(record.contents, cacheKey);
 
   // make sure the promise ^ resolves before returning
   await touchPromise;
 
-  return {
+  return createCORSResponse(event, {
     statusCode: 200,
     headers: {
       'Cache-Control': `public, max-age=${Math.floor(config.signedUrlExpiresIn * 0.9)}`, // signed url expiry, deducting a margin
       'Content-Type': 'application/x-mpegURL',
     },
     body,
-  };
-};
-
-const handler = createHandler(async (event) => {
-  logger.debug('Running with config', config);
-
-  try {
-    const response = await handleRequest(event);
-
-    return {
-      ...response,
-      headers: {
-        // all is json
-        'Content-Type': 'application/json',
-
-        // mix in the cors headers
-        ...getCorsHeaders({
-          requestHeaders: event.headers,
-          allowedOrigins: config.CORSAllowedOrigins,
-        }),
-
-        ...response.headers,
-      },
-    };
-  } catch (error) {
-    logger.error('The request failed', { error: error.message });
-    throw error;
-  }
+  });
 });
 
 // eslint-disable-next-line import/prefer-default-export

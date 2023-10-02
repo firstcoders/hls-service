@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import { logger } from '@soundws/service-libs';
+import logger from '@soundws/service-libs/src/logger';
 import audioConvertToM4a from './audioConvertToM4a';
 import audioConvertToMp3 from './audioConvertToMp3';
 import audioConvertToOggVorbis from './audioConvertToOggVorbis';
