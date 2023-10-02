@@ -1,6 +1,6 @@
 {
   "name": "@soundws/hls-service",
-  "version": "3.1.0-beta.0",
+  "version": "3.1.0-beta.1",
   "license": "AGPL-3.0-or-later",
   "description": "A serverless microservice to segment audio for consumption by our stem player",
   "author": "The First Coders Team (https://www.firstcoders.co.uk)",
@@ -47,7 +47,7 @@
     "@aws-sdk/lib-dynamodb": "^3.421.0",
     "@aws-sdk/s3-request-presigner": "^3.421.0",
     "@sindresorhus/is": "^4.4.0",
-    "@soundws/service-libs": "^1.3.1-beta.2",
+    "@soundws/service-libs": "^1.3.1-beta.3",
     "axios": "^0.26.0",
     "axios-retry": "^3.2.4",
     "winston": "^3.10.0"
@@ -76,6 +76,6 @@
     "precommit": "lint-staged",
     "prepublishOnly": "npm run build",
     "prepack": "rm -rf dist/ && mkdir -p dist/aws-sam && cp -R .aws-sam/build dist/aws-sam",
-    "sam:publish": "npm run build && sam package --template-file .aws-sam/build/template.yaml --output-template-file .aws-sam/build/packaged.yaml --s3-bucket $AWS_SAM_PACKAGE_BUCKET_NAME --region ${AWS_REGION:=us-east-1} && sam publish --template .aws-sam/build/packaged.yaml --region ${AWS_REGION:=us-east-1} --semantic-version $npm_package_version"
+    "sam:publish": "npm run build && sam package --template-file .aws-sam/build/template.yaml --output-template-file .aws-sam/build/packaged.yaml --s3-bucket $AWS_SAM_PACKAGE_BUCKET_NAME --region $AWS_REGION && sam publish --template .aws-sam/build/packaged.yaml --region $AWS_REGION --semantic-version $npm_package_version"
   }
 }
