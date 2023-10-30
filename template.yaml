@@ -270,6 +270,8 @@ Resources:
           - handlers/purgeObjects.js
         External:
           - '@aws-sdk'
+        Banner:
+          - js=import { createRequire } from 'module'; const require = createRequire(import.meta.url);
 
   # ********************************* General Resources *********************************
   AudioBucket:

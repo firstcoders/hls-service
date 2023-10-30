@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0-beta.3](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.0-beta.2...@soundws/hls-service@3.1.0-beta.3) (2023-10-30)
+
+
+### Reverts
+
+* Revert "chore(hls-service): removed hls-srv from folder prefix" ([e135d62](https://github.com/sound-ws/hls-service/commit/e135d6259e16ca4009c374ade2faf20574b1a6fa))
+
+
+
+
+
 # [3.1.0-beta.2](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.0-beta.1...@soundws/hls-service@3.1.0-beta.2) (2023-10-02)
 
 **Note:** Version bump only for package @soundws/hls-service
