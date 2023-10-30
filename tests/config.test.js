@@ -12,7 +12,7 @@ describe('config', () => {
       jwtAudience: 'api.sound.ws',
       m3u8FileTable: undefined,
       m3u8FileTableTTL: 2592000,
-      signedUrlExpiresIn: 3600,
+      signedUrlExpiresIn: 900,
       createM3U8LambdaArn: undefined,
       s3CacheDuration: 2592000,
       validSampleRates: [22050],

@@ -22,7 +22,8 @@ import parseCsv from '../libs/parseCsv';
  * @param {Object} event
  */
 export default (event) => {
-  const { sampleRate, bitRate, segmentTime, format, sourceUrl } = event.queryStringParameters || {};
+  const { sampleRate, bitRate, segmentTime, format, sourceUrl, signObjectUrls } =
+    event.queryStringParameters || {};
   const { authorizer } = event.requestContext || {};
   const { validSampleRates, validBitrates, validSegmentTimes, validAudioFormats } = config;
   const allowedAudioOrigins = authorizer?.allowedAudioOrigins
@@ -31,6 +32,7 @@ export default (event) => {
 
   const options = {
     sourceUrl,
+    signObjectUrls: signObjectUrls !== 'false' && signObjectUrls !== false,
     sampleRate: sampleRate ? parseInt(sampleRate, 10) : validSampleRates[0],
     bitRate: bitRate ? parseInt(bitRate, 10) : validBitrates[0],
     segmentTime: segmentTime ? parseInt(segmentTime, 10) : validSegmentTimes[0],

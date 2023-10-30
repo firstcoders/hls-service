@@ -77,7 +77,7 @@ Parameters:
   SignedUrlExpirySec:
     Type: String
     Description: The duration of the signed urls to the audio
-    Default: 21600
+    Default: 900
   # ReservedConcurrentExecutions:
   #   Type: Number
   #   Description: The number of reserved concurrent executions for each lambda

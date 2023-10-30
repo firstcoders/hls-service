@@ -50,13 +50,6 @@ describe('getM3u8', () => {
       expect(response.headers['Content-Type']).toBe('application/x-mpegURL');
     });
 
-    it('returns a 200 with correct Cache-Control header', async () => {
-      const response = await handler(event);
-
-      expect(response.statusCode).toBe(200);
-      expect(response.headers['Cache-Control']).toBe('public, max-age=1110'); // signedUrlExpiresIn / 2
-    });
-
     it('returns a 200 with appropriate CORS headers', async () => {
       const response = await handler(event);
 
@@ -94,6 +87,24 @@ describe('getM3u8', () => {
         });
 
         expect(response.body).toMatch(/https:\/\/this-is-a-signed-url\/drums.wav\?key=blah/);
+      });
+    });
+
+    describe('when #queryParams.signObjectUrls is undefined', () => {
+      it('signs the object Urls', async () => {
+        const response = await handler(event);
+        expect(response.body).toMatch(/https:\/\/this-is-a-signed-url\/drums.wav\?key=blah/);
+      });
+    });
+
+    describe('when #queryParams.signObjectUrls is false', () => {
+      it('does not sign the object Urls', async () => {
+        const response = await handler({
+          ...event,
+          queryStringParameters: { ...event.queryStringParameters, signObjectUrls: 'false' },
+        });
+        expect(response.body).not.toMatch(/https:\/\/this-is-a-signed-url\/drums.wav\?key=blah/);
+        expect(response.body).toMatch(/sound-ws\/hls-srv\//);
       });
     });
   });

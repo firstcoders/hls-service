@@ -102,6 +102,7 @@ describe('parseRequestOptions', () => {
         sampleRate: 100,
         bitRate: 128,
         segmentTime: 5,
+        signObjectUrls: true,
         format: 'mp3',
       });
     });

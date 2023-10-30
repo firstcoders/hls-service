@@ -35,7 +35,7 @@ export default {
 
   m3u8FileTableTTL: parseInt(process.env.AUDIO_CACHE_TTL, 10) || 60 * 60 * 24 * 30,
 
-  signedUrlExpiresIn: parseInt(process.env.SIGNED_URL_EXPIRY_SEC, 10) || 3600,
+  signedUrlExpiresIn: parseInt(process.env.SIGNED_URL_EXPIRY_SEC, 10) || 900,
 
   createM3U8LambdaArn: process.env.LAMBDA_CREATE_M3U8_ARN,
 

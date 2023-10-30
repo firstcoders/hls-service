@@ -62,8 +62,12 @@ const handler = createHandler(async (event) => {
     record = await ddbGetObject(key, true);
   }
 
+  let body = record.contents;
+
   // transform the segment keys in the m3u8 into a fully qualified, signed url
-  const body = await transformMu38ObjectPathsToUrls(record.contents, cacheKey);
+  if (options.signObjectUrls) {
+    body = await transformMu38ObjectPathsToUrls(record.contents, cacheKey);
+  }
 
   // make sure the promise ^ resolves before returning
   await touchPromise;
@@ -71,7 +75,6 @@ const handler = createHandler(async (event) => {
   return createCORSResponse(event, {
     statusCode: 200,
     headers: {
-      'Cache-Control': `public, max-age=${Math.floor(config.signedUrlExpiresIn * 0.9)}`, // signed url expiry, deducting a margin
       'Content-Type': 'application/x-mpegURL',
     },
     body,
