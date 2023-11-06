@@ -53,9 +53,9 @@
     "winston": "^3.10.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.22.20",
+    "@babel/core": "^7.23.2",
     "@babel/eslint-parser": "^7.22.15",
-    "@babel/preset-env": "^7.22.20",
+    "@babel/preset-env": "^7.23.2",
     "assert": "^2.0.0",
     "babel-jest": "^29.7.0",
     "esbuild": "^0.19.4",
