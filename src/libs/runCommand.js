@@ -31,7 +31,7 @@ export default async (bin, options) =>
       encoding: 'utf-8',
     });
 
-    process.on('data', (data) => logger.silly(data));
+    // process.on('data', (data) => logger.silly(data));
 
     process.on('error', (err) => {
       logger.error('Failed command', {

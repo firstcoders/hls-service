@@ -25,10 +25,6 @@ Parameters:
     Type: String
     Description: The api gateway stage name
     Default: 'prd'
-    AllowedValues:
-      - dev
-      - uat
-      - prd
   AllowedSamplerates:
     Type: CommaDelimitedList
     Description: Comma-delimited list of allowed sample rates
