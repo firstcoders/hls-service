@@ -70,7 +70,8 @@ const handler = createHandler(async (event) => {
   await rmdir(path, { recursive: true, force: true });
 
   // store the data in dynamodb
-  await ddbPutObject(key, m3u8FileContents);
+
+  await ddbPutObject(key, m3u8FileContents, options);
 
   return createCORSResponse(event, {
     statusCode: 201,
