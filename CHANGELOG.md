@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.0-beta.8...@soundws/hls-service@3.1.0) (2024-02-04)
+
+**Note:** Version bump only for package @soundws/hls-service
+
+# [3.1.0-beta.8](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.0-beta.7...@soundws/hls-service@3.1.0-beta.8) (2024-01-27)
+
+### Features
+
+- **hls-service:** store hostname and pathname in ddb ([3cfc212](https://github.com/sound-ws/hls-service/commit/3cfc212b9403a411ba2d791d4986b501060c162d))
+
 # [3.1.0-beta.7](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.0-beta.6...@soundws/hls-service@3.1.0-beta.7) (2023-11-24)
 
 **Note:** Version bump only for package @soundws/hls-service
