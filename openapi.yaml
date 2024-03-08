@@ -9,7 +9,7 @@ servers:
     description: An example endpoint
 
 paths:
-  /:
+  /hls:
     get:
       summary: Generates a m3u8 file given a wav
       description: Takes a sourceUrl for a WAV and returns a m3u8 playlist

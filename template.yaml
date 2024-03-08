@@ -167,7 +167,7 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref ServiceApi
-            Path: /
+            Path: /hls
             Method: get
       Policies:
         - S3ReadPolicy:
@@ -205,7 +205,7 @@ Resources:
         CreateM3u8:
           Type: Api
           Properties:
-            Path: /
+            Path: /hls
             Method: post
             RestApiId: !Ref ServiceApi
       Policies:
