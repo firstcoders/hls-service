@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.2-beta.1](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.2-beta.0...@soundws/hls-service@3.1.2-beta.1) (2024-03-08)
+
+**Note:** Version bump only for package @soundws/hls-service
+
+
+
+
+
 ## [3.1.2-beta.0](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.1...@soundws/hls-service@3.1.2-beta.0) (2024-03-06)
 
 **Note:** Version bump only for package @soundws/hls-service
