@@ -127,6 +127,8 @@ Resources:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref StageName
+      EndpointConfiguration:
+        Type: REGIONAL
       # https://github.com/aws/serverless-application-model/releases/tag/v1.46.0
       # https://github.com/aws/serverless-application-model/pull/2298
       ApiKeySourceType: AUTHORIZER
