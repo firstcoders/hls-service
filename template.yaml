@@ -322,6 +322,24 @@ Outputs:
   ServiceApi:
     Description: 'API Gateway endpoint URL'
     Value: !Sub 'https://${ServiceApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/'
+  GetM3u8FunctionArn:
+    Description: The ARN of the getwaveform function
+    Value: !GetAtt GetM3u8Function.Arn
+  GetM3u8FunctionRoleArn:
+    Description: The ARN of the getwaveform function role
+    Value: !GetAtt GetM3u8FunctionRole.Arn
+  CreateM3u8FunctionArn:
+    Description: The ARN of the createwaveform function
+    Value: !GetAtt CreateM3u8Function.Arn
+  CreateM3u8FunctionRoleArn:
+    Description: The ARN of the createwaveform function role
+    Value: !GetAtt CreateM3u8FunctionRole.Arn
+  PurgeObjectsFromS3FunctionArn:
+    Description: The ARN of the purge s3 objects function
+    Value: !GetAtt PurgeObjectsFromS3Function.Arn
+  PurgeObjectsFromS3FunctionRoleArn:
+    Description: The ARN of the purge s3 objects function role
+    Value: !GetAtt PurgeObjectsFromS3FunctionRole.Arn
 
 Metadata:
   AWS::ServerlessRepo::Application:
