@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0-beta.0](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.2-beta.2...@soundws/hls-service@3.2.0-beta.0) (2024-03-28)
+
+
+### Features
+
+* **hls-service:** increase lambda timeout. Remove max duration ([933261b](https://github.com/sound-ws/hls-service/commit/933261b1beeb807861847b3e108cd8948ad3fdfe))
+
+
+
+
+
 ## [3.1.2-beta.2](https://github.com/sound-ws/hls-service/compare/@soundws/hls-service@3.1.2-beta.1...@soundws/hls-service@3.1.2-beta.2) (2024-03-08)
 
 **Note:** Version bump only for package @soundws/hls-service
