@@ -201,15 +201,8 @@ Resources:
     Properties:
       Description: Generates a m3u8 file given a wav
       MemorySize: 4096
-      Timeout: 120
+      Timeout: 300
       Handler: handlers/createM3u8.handler
-      Events:
-        CreateM3u8:
-          Type: Api
-          Properties:
-            Path: /hls
-            Method: post
-            RestApiId: !Ref ServiceApi
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref M3u8FileTable

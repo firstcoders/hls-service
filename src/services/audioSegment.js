@@ -20,7 +20,6 @@ import logger from '@soundws/service-libs/src/logger';
 import convertWavToFormat from '../libs/audioConvertWavToFormat';
 import audioSegmentToWav from '../libs/audioSegmentToWav';
 import getTmpFolder from '../libs/getTmpFolder';
-import config from '../config';
 
 export default async (options) => {
   try {
@@ -34,7 +33,6 @@ export default async (options) => {
     // 1 first we simply segment the wavs without converting to the target format
     await audioSegmentToWav({
       tmpWorkspaceFolder,
-      audioOutputMaxDuration: config.audioOutputMaxDuration, // ensure we dont produce overly large files
       ...options,
     });
 
