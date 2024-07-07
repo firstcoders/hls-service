@@ -5,7 +5,7 @@ import getTmpFolder from '../../src/libs/getTmpFolder';
 import audioSegmentToWav from '../../src/libs/audioSegmentToWav';
 import audioConvertWavToFormat from '../../src/libs/audioConvertWavToFormat';
 
-jest.mock('@soundws/service-libs/src/logger');
+jest.mock('@firstcoders/service-libs/src/logger');
 jest.mock('../../src/libs/getTmpFolder');
 jest.mock('../../src/libs/runCommand');
 jest.mock('../../src/libs/audioSegmentToWav');

@@ -1,8 +1,8 @@
-import s3SignUrl from '@soundws/service-libs/src/s3SignUrl';
+import s3SignUrl from '@firstcoders/service-libs/src/s3SignUrl';
 import generateUrlForObject from '../../src/services/generateUrlForObject';
 import config from '../../src/config';
 
-jest.mock('@soundws/service-libs/src/s3SignUrl');
+jest.mock('@firstcoders/service-libs/src/s3SignUrl');
 
 config.signedUrlExpiresIn = 12345;
 config.audioBucketName = 'myaudiobucket';

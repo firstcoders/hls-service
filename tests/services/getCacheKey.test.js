@@ -1,6 +1,6 @@
 import getCacheKey from '../../src/services/getCacheKey';
 
-jest.mock('@soundws/service-libs');
+jest.mock('@firstcoders/service-libs');
 
 describe('getCacheKey', () => {
   it('segments the file into wav, then from wav into mp3s and deletes the wav', async () => {

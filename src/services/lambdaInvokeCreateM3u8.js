@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import lambdaInvoke from '@soundws/service-libs/src/lambdaInvoke';
+import lambdaInvoke from '@firstcoders/service-libs/src/lambdaInvoke';
 import config from '../config';
 
 /**

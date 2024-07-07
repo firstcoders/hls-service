@@ -336,7 +336,7 @@ Outputs:
 
 Metadata:
   AWS::ServerlessRepo::Application:
-    Name: soundws-hls-service
+    Name: firstcoders-hls-service
     Description: >
       A serverless micro-service to transcode audio into HLS format.
     Author: Team First Coders

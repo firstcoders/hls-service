@@ -1,4 +1,4 @@
-import getCorsHeaders from '@soundws/service-libs/src/getCorsHeaders';
+import getCorsHeaders from '@firstcoders/service-libs/src/getCorsHeaders';
 import config from '../config';
 
 export default (event, response) => ({

@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import logger from '@soundws/service-libs/src/logger';
-import createHandler from '@soundws/service-libs/src/createHandler';
+import logger from '@firstcoders/service-libs/src/logger';
+import createHandler from '@firstcoders/service-libs/src/createHandler';
 import lambdaInvokeCreateM3u8 from '../services/lambdaInvokeCreateM3u8';
 import ddbGetObject from '../services/ddbGetObject';
 import ddbTouchObject from '../services/ddbTouchObject';

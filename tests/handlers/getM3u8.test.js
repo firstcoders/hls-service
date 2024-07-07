@@ -1,16 +1,16 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
-import ddbGetRecord from '@soundws/service-libs/src/ddbGetRecord';
-import lambdaInvoke from '@soundws/service-libs/src/lambdaInvoke';
+import ddbGetRecord from '@firstcoders/service-libs/src/ddbGetRecord';
+import lambdaInvoke from '@firstcoders/service-libs/src/lambdaInvoke';
 import { handler } from '../../src/handlers/getM3u8';
 import event from '../events/getM3u8';
 import generateUrlForObject from '../../src/services/generateUrlForObject';
 import config from '../../src/config';
 
-jest.mock('@soundws/service-libs/src/ddbGetRecord');
-jest.mock('@soundws/service-libs/src/ddbPutRecord');
-jest.mock('@soundws/service-libs/src/lambdaInvoke');
-jest.mock('@soundws/service-libs/src/logger');
+jest.mock('@firstcoders/service-libs/src/ddbGetRecord');
+jest.mock('@firstcoders/service-libs/src/ddbPutRecord');
+jest.mock('@firstcoders/service-libs/src/lambdaInvoke');
+jest.mock('@firstcoders/service-libs/src/logger');
 jest.mock('../../src/services/generateUrlForObject');
 
 config.createM3U8LambdaArn = 'arn:thisismycreatefunction';

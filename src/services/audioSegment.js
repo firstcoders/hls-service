@@ -16,7 +16,7 @@
  */
 import { readdir, readFile, writeFile, unlink } from 'fs/promises';
 import { resolve } from 'path';
-import logger from '@soundws/service-libs/src/logger';
+import logger from '@firstcoders/service-libs/src/logger';
 import convertWavToFormat from '../libs/audioConvertWavToFormat';
 import audioSegmentToWav from '../libs/audioSegmentToWav';
 import getTmpFolder from '../libs/getTmpFolder';

@@ -13,13 +13,13 @@ Installation of this service requires an AWS account and IAM credentials with ap
 # Installation
 
 ```shell
-npm install @soundws/hls-service
+npm install @firstcoders/hls-service
 ```
 
 or using yarn
 
 ```shell
-yarn add @soundws/hls-service
+yarn add @firstcoders/hls-service
 ```
 
 # Deployment

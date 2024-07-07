@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import s3SignUrl from '@soundws/service-libs/src/s3SignUrl';
+import s3SignUrl from '@firstcoders/service-libs/src/s3SignUrl';
 import config from '../config';
 
 /**

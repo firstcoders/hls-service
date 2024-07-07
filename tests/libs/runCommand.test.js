@@ -1,6 +1,6 @@
 import runCommand from '../../src/libs/runCommand';
 
-jest.mock('@soundws/service-libs/src/logger');
+jest.mock('@firstcoders/service-libs/src/logger');
 
 describe('runCommand', () => {
   describe('when a command succeeds', () => {

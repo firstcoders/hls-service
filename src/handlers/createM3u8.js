@@ -15,9 +15,9 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 import { rmdir } from 'fs/promises';
-import logger from '@soundws/service-libs/src/logger';
-import createHandler from '@soundws/service-libs/src/createHandler';
-import s3PutFolder from '@soundws/service-libs/src/s3PutFolder';
+import logger from '@firstcoders/service-libs/src/logger';
+import createHandler from '@firstcoders/service-libs/src/createHandler';
+import s3PutFolder from '@firstcoders/service-libs/src/s3PutFolder';
 import parseRequestOptions from '../services/parseRequestOptions';
 import getS3Key from '../services/getS3Key';
 import ddbGetObject from '../services/ddbGetObject';

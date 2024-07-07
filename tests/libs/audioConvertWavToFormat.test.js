@@ -1,7 +1,7 @@
 import audioConvertWavToFormat from '../../src/libs/audioConvertWavToFormat';
 import runCommand from '../../src/libs/runCommand';
 
-jest.mock('@soundws/service-libs/src/logger');
+jest.mock('@firstcoders/service-libs/src/logger');
 jest.mock('../../src/libs/runCommand');
 
 process.env.LAME_BIN_PATH = '/path/to/lame';

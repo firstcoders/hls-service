@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
-import logger from '@soundws/service-libs/src/logger';
-import createHandler from '@soundws/service-libs/src/createHandler';
-import s3DeleteObject from '@soundws/service-libs/src/s3DeleteObject';
+import logger from '@firstcoders/service-libs/src/logger';
+import createHandler from '@firstcoders/service-libs/src/createHandler';
+import s3DeleteObject from '@firstcoders/service-libs/src/s3DeleteObject';
 import config from '../config';
 
 const handler = createHandler(async (event) => {
