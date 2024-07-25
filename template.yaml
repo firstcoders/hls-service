@@ -121,6 +121,7 @@ Globals:
         CORS_ALLOWED_ORIGIN: !Join [',', !Ref CORSAllowedOrigins]
         SIGNED_URL_EXPIRY_SEC: !Ref SignedUrlExpirySec
         AUDIO_OUTPUT_MAX_DURATION: !Ref AudioOutputMaxDuration
+        S3_FOLDER_PREFIX: 'hls-srv'
 
 Resources:
   ServiceApi:

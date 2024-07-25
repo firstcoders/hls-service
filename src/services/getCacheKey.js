@@ -16,7 +16,10 @@
  */
 import { createHash } from 'crypto';
 
-export default (sourceUrl) => {
+export default ({ sourceUrl, format, segmentTime, bitRate, sampleRate }) => {
   const { hostname, pathname } = new URL(sourceUrl);
-  return createHash('md5').update(`${hostname}:${pathname}`).digest('hex');
+
+  return createHash('md5')
+    .update(`${hostname}:${pathname}:${format}:${segmentTime}:${bitRate}:${sampleRate}`)
+    .digest('hex');
 };

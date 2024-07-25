@@ -27,7 +27,7 @@ export default {
   CORSAllowedOrigins: process.env.CORS_ALLOWED_ORIGIN,
   // List of origins from which the service can fetch audio
   // the folder prefix of the generated waveform json on s3
-  s3FolderPrefix: 'sound-ws/hls-srv/audio',
+  s3FolderPrefix: process.env.S3_FOLDER_PREFIX,
   // JWT audience to verify in the JWT
   jwtAudience: 'api.sound.ws',
 

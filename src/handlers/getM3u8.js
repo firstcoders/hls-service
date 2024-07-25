@@ -40,10 +40,10 @@ const handler = createHandler(async (event) => {
     });
   }
 
-  const cacheKey = getCacheKey(options.sourceUrl);
+  const cacheKey = getCacheKey(options);
 
   // get the fully qualified key on S3
-  const key = getS3Key(cacheKey, options);
+  const key = getS3Key(cacheKey);
 
   // we don't wait for touch as it can run concurrently
   const touchPromise = ddbTouchObject(key).catch(() => {});

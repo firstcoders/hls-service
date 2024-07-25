@@ -31,10 +31,10 @@ const handler = createHandler(async (event) => {
   logger.debug('Running with config', config);
 
   const options = parseRequestOptions(event);
-  const cacheKey = getCacheKey(options.sourceUrl);
+  const cacheKey = getCacheKey(options);
 
   // get the fully qualified key on S3
-  const key = getS3Key(cacheKey, options);
+  const key = getS3Key(cacheKey);
 
   // Check if we already have segmented this file previously
   // TODO getM3u8 checks S3. Perhaps check S3 here too instead of ddb
