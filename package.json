@@ -1,7 +1,7 @@
 {
   "name": "@firstcoders/hls-service",
   "private": true,
-  "version": "3.2.0-beta.1",
+  "version": "3.2.0-beta.2",
   "license": "AGPL-3.0-or-later",
   "description": "A serverless microservice to segment audio for consumption by our stem player",
   "author": "The First Coders Team (https://www.firstcoders.co.uk)",
