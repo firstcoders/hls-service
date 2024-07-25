@@ -8,7 +8,7 @@ describe('config', () => {
       audioBucketName: undefined,
       audioOutputMaxDuration: 600,
       CORSAllowedOrigins: undefined,
-      s3FolderPrefix: 'sound-ws/hls-srv/audio',
+      s3FolderPrefix: 'hls-srv',
       jwtAudience: 'api.sound.ws',
       m3u8FileTable: undefined,
       m3u8FileTableTTL: 2592000,

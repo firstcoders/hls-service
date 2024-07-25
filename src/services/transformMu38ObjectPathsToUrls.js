@@ -1,14 +1,14 @@
 import generateUrlForObject from './generateUrlForObject';
 import config from '../config';
 
-export default async (m3u8, cacheKey) => {
+export default async (m3u8) => {
   // fetch keys from m3u8
   const objects = m3u8.match(
     new RegExp(
       `${
         config.s3FolderPrefix
         // eslint-disable-next-line no-useless-escape
-      }/${cacheKey}(\/[a-z0-9]+)+[a-z]+\.segment-[0-9]+\.[a-z0-9]+`,
+      }\/[a-f0-9]{32}/segment-[0-9]+\.[a-z0-9]+`,
       'gs',
     ),
   );

@@ -104,7 +104,7 @@ describe('getM3u8', () => {
           queryStringParameters: { ...event.queryStringParameters, signObjectUrls: 'false' },
         });
         expect(response.body).not.toMatch(/https:\/\/this-is-a-signed-url\/drums.wav\?key=blah/);
-        expect(response.body).toMatch(/sound-ws\/hls-srv\//);
+        expect(response.body).toMatch(/hls-srv\//);
       });
     });
   });
