@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: A microservice to convert source audio and stream it (in HLS format).
+Description: >
+  This serverless application deploys a couple of Lambda function and an API Gateway to your AWS account
+  that segments a source audio file into HLS segments stores these in a bucket and then serves the resulting m3u8 file.
 
 Conditions:
   CreateBucket: !Not [!Equals [!Ref ExistingBucket, true]]
@@ -340,7 +342,7 @@ Metadata:
     ReadmeUrl: README.md
     SpdxLicenseId: AGPL-3.0-or-later
     LicenseUrl: LICENSE
-    Labels: ['layer', 'lambda', 'serverless', 'ffmpeg', 'hls', 'm3u8', 'stemplayer']
+    Labels: ['ffmpeg', 'hls', 'm3u8', 'transcode']
     HomePageUrl: https://github.com/firstcoders/hls-service
     SourceCodeUrl: https://github.com/firstcoders/hls-service
     SemanticVersion: 1.0.0 # overwritten by sam publish cli command
