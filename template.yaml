@@ -333,7 +333,7 @@ Outputs:
 
 Metadata:
   AWS::ServerlessRepo::Application:
-    Name: firstcoders-hls-service
+    Name: fc-hls-service
     Description: >
       A serverless micro-service to transcode audio into HLS format.
     Author: Team First Coders
