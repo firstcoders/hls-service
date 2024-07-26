@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: >
-  This serverless application deploys a couple of Lambda function and an API Gateway to your AWS account
-  that segments a source audio file into HLS segments stores these in a bucket and then serves the resulting m3u8 file.
+Description: A microservice to convert source audio into HLS format
 
 Conditions:
   CreateBucket: !Not [!Equals [!Ref ExistingBucket, true]]
@@ -92,6 +90,10 @@ Parameters:
     Type: String
     Description: The ARN of a lambda authorizer
     Default: ''
+  S3FolderPrefix:
+    Type: String
+    Description: A prefix under which the generated files will be stored
+    Default: 'hls-srv'
 
 Globals:
   # https://github.com/aws/serverless-application-model/issues/191
@@ -119,7 +121,7 @@ Globals:
         CORS_ALLOWED_ORIGIN: !Join [',', !Ref CORSAllowedOrigins]
         SIGNED_URL_EXPIRY_SEC: !Ref SignedUrlExpirySec
         AUDIO_OUTPUT_MAX_DURATION: !Ref AudioOutputMaxDuration
-        S3_FOLDER_PREFIX: 'hls-srv'
+        S3_FOLDER_PREFIX: !Ref S3FolderPrefix
 
 Resources:
   ServiceApi:
@@ -337,7 +339,8 @@ Metadata:
   AWS::ServerlessRepo::Application:
     Name: fc-hls-service
     Description: >
-      A serverless micro-service to transcode audio into HLS format.
+      This serverless application deploys a couple of Lambda function and an API Gateway to your AWS account
+      that segments a source audio file on-the-fly into HLS segments stores these in a bucket and then serves the resulting m3u8 file.
     Author: Team First Coders
     ReadmeUrl: README.md
     SpdxLicenseId: AGPL-3.0-or-later
