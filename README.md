@@ -10,28 +10,6 @@ A serverless micro-service to transcode audio into HLS format.
 
 Installation of this service requires an AWS account and IAM credentials with appropriate permissions.
 
-# Installation
-
-```shell
-npm install @firstcoders/hls-service
-```
-
-or using yarn
-
-```shell
-yarn add @firstcoders/hls-service
-```
-
-# Deployment
-
-Please refer to the AWS SAM documentation on how to deploy [AWS SAM applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-deploying.html)
-
-Refer to the `dist/template.yaml` file for information on the cloudformation deployment parameters.
-
-Note that deployment of this service depends on a lambda layer provided via the parameter `AudioToolsLayerArn`. Please refer to the [Audio Tools Lambda Layer](https://github.com/sound-ws/audio-tools-lambda-layer) documentation.
-
-See also here [for an example on how to deploy both using nested cloudfomation stacks](./examples/nested-apps/)
-
 # License
 
 Copyright (C) 2019-2023 First Coders LTD
