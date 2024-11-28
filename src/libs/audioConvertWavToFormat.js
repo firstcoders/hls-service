@@ -19,6 +19,7 @@ import audioConvertToM4a from './audioConvertToM4a';
 import audioConvertToMp3 from './audioConvertToMp3';
 import audioConvertToOggVorbis from './audioConvertToOggVorbis';
 import audioConvertToOggOpus from './audioConvertToOggOpus';
+import audioConvertToOpusWebm from './audioConvertToOpusWebm';
 
 export default async ({ file, format, ...options }) => {
   try {
@@ -30,6 +31,7 @@ export default async ({ file, format, ...options }) => {
     else if (format === 'mp3') await audioConvertToMp3({ file, output, ...options });
     else if (format === 'ogg') await audioConvertToOggVorbis({ file, output, ...options });
     else if (format === 'oga') await audioConvertToOggOpus({ file, output, ...options });
+    else if (format === 'webm') await audioConvertToOpusWebm({ file, output, ...options });
     else throw new Error('Invalid format');
 
     logger.debug('Completed converting file', { file, format });
