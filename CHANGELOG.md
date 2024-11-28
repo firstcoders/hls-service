@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.3.0-beta.0](https://github.com/firstcoders/hls-service/compare/@firstcoders/hls-service@3.2.0...@firstcoders/hls-service@3.3.0-beta.0) (2024-11-28)
+
+
+### Features
+
+* **hls-service:** add opus in webm support ([bbd7673](https://github.com/firstcoders/hls-service/commit/bbd7673abbe7f9076acee529f10cae666cdd2034))
+
+
+
+
+
 # [3.2.0](https://github.com/firstcoders/hls-service/compare/@firstcoders/hls-service@3.2.0-beta.3...@firstcoders/hls-service@3.2.0) (2024-07-26)
 
 **Note:** Version bump only for package @firstcoders/hls-service
