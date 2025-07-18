@@ -3,14 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.3.0-beta.3](https://github.com/firstcoders/hls-service/compare/@firstcoders/hls-service@3.3.0-beta.2...@firstcoders/hls-service@3.3.0-beta.3) (2025-07-18)
-
-**Note:** Version bump only for package @firstcoders/hls-service
-
-
-
-
-
 # [3.3.0-beta.2](https://github.com/firstcoders/hls-service/compare/@firstcoders/hls-service@3.3.0-beta.1...@firstcoders/hls-service@3.3.0-beta.2) (2025-01-08)
 
 **Note:** Version bump only for package @firstcoders/hls-service
